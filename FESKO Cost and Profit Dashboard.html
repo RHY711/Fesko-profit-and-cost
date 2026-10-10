@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FESKO Cost and Profit Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f5;--card:#fff;--ink:#12302c;--mut:#5b716d;--line:#d6e2df;--acc:#0f766e;--c1:#0f766e;--c2:#e0a800;--c3:#b4235a;--c4:#4f6bd8;--c5:#8a9a96;--bad:#b4235a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1b19;--card:#152826;--ink:#e6f2ef;--mut:#9bb3ae;--line:#264340;--acc:#3dbdb0;--c1:#3dbdb0;--c2:#f0c040;--c3:#e8648f;--c4:#8ea2f5;--c5:#7d918d}}
+:root[data-theme="dark"]{--bg:#0e1b19;--card:#152826;--ink:#e6f2ef;--mut:#9bb3ae;--line:#264340;--acc:#3dbdb0;--c1:#3dbdb0;--c2:#f0c040;--c3:#e8648f;--c4:#8ea2f5;--c5:#7d918d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.5}
+header{padding:20px 16px 8px;max-width:1180px;margin:0 auto}
+h1{font-size:22px;margin:0 0 2px}h2{font-size:16px;margin:0 0 10px}
+.sub{color:var(--mut);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:8px 16px 32px;display:grid;gap:14px;grid-template-columns:300px 1fr}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.ctl label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0 2px;font-weight:600}
+.ctl input[type=number]{width:76px;padding:5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.ctl input[type=range]{width:100%;accent-color:var(--acc)}
+.ctl .grp{border-top:1px solid var(--line);margin-top:12px;padding-top:6px}
+.val{color:var(--acc);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi b{display:block;font-size:20px;color:var(--acc)}.kpi span{color:var(--mut);font-size:12px}
+.row{display:grid;grid-template-columns:170px 1fr 92px;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+@media (max-width:520px){.row{grid-template-columns:110px 1fr 70px;font-size:12px}}
+.bar{height:16px;background:var(--bg);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);border-radius:4px}
+.bar i.neg{background:var(--bad)}
+.stack{display:flex;height:30px;border-radius:6px;overflow:hidden;margin:8px 0}
+.stack div{height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+select{font:inherit;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);max-width:100%}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+th{color:var(--mut);font-weight:600}.neg{color:var(--bad)}
+ul{margin:6px 0 0;padding-left:18px;color:var(--mut)}
+.right{display:flex;flex-direction:column;gap:14px}
+</style></head><body>
+<header><h1>FESKO cost and profit</h1><p class="sub">Change prices and assumptions on the left. Every figure updates straight away. All amounts in RM.</p></header>
+<div class="wrap">
+<aside class="card ctl" aria-label="Controls">
+<h2>Selling prices</h2>
+<label>Air Goncang <input type="number" id="p_g" step="0.5" min="0" value="5"></label>
+<label>Air Milky Blist <input type="number" id="p_m" step="0.5" min="0" value="6"></label>
+<label>Air Balang (per cup) <input type="number" id="p_b" step="0.5" min="0" value="3"></label>
+<label>Ais Kepal <input type="number" id="p_k" step="0.5" min="0" value="6"></label>
+<div class="chips" id="kprice"><button data-p="6" class="on">Kepal RM6</button><button data-p="5">Kepal RM5</button></div>
+<div class="grp"><h2>Assumptions</h2>
+<label>Milky Blist cups per 0.5kg flavour <span class="val" id="o_mc"></span></label><input type="range" id="mc" min="3" max="15" step="1" value="7">
+<label>Balang cups per 40L <span class="val" id="o_bc"></span></label><input type="range" id="bc" min="10" max="40" step="1" value="20">
+<label>Ais Kepal flavour (g) <span class="val" id="o_kg"></span></label><input type="range" id="kg" min="20" max="60" step="1" value="40">
+<label>Air Goncang flavour (g) <span class="val" id="o_gg"></span></label><input type="range" id="gg" min="4" max="20" step="1" value="8">
+<label>Ais Kepal topping</label>
+<div class="chips" id="top"><button data-t="rice" class="on">Chocolate rice</button><button data-t="coco">Cococrunch</button></div></div>
+<div class="grp"><h2>Show flavour</h2><div class="chips" id="fl"></div></div>
+<div class="grp"><button id="reset">Reset to base case</button></div>
+</aside>
+<main class="right">
+<div class="kpis" id="kpis"></div>
+<section class="card"><h2>Profit per serving</h2>
+<div class="chips" id="metric"><button data-m="profit" class="on">Profit (RM)</button><button data-m="margin">Margin (%)</button></div>
+<div id="rank"></div></section>
+<section class="card"><h2>Where the cost goes</h2>
+<select id="pick" aria-label="Choose a product"></select>
+<div class="stack" id="stack" role="img" aria-label="Cost breakdown"></div><div class="leg" id="leg"></div></section>
+<section class="card"><h2>All products</h2><div class="scroll"><table><thead><tr><th>Product</th><th>Flavour</th><th>Cost</th><th>Price</th><th>Profit</th><th>Margin</th></tr></thead><tbody id="tb"></tbody></table></div></section>
+<section class="card"><h2>What is still an estimate</h2><ul>
+<li>Air Milky Blist: 0.5kg of flavour makes about 7 cups (about 71g per cup).</li>
+<li>Air Balang: 20 cups per balang is a guess, and the 16oz cup price is still the old RM0.14 placeholder.</li>
+<li>Air Goncang: the straw kecik cost is not included yet.</li>
+<li>Ais Kepal: flavour is about 40g per cup, and the cup is full of ice.</li></ul></section>
+</main></div>
+<script>
+const FP={Strawberry:21.5,Chocolate:30,Cappuccino:29,Latte:31};
+const COL=['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)'];
+const S={p_g:5,p_m:6,p_b:3,p_k:6,mc:7,bc:20,kg:40,gg:8,top:'rice',metric:'profit',fl:new Set(Object.keys(FP)),pick:0};
+const D={p_g:5,p_m:6,p_b:3,p_k:6,mc:7,bc:20,kg:40,gg:8,top:'rice'};
+const $=id=>document.getElementById(id), rm=v=>'RM'+v.toFixed(2), pc=v=>(v*100).toFixed(1)+'%';
+function build(){
+ const out=[], g=S.gg, fcost=(n,gr)=>FP[n]/1000*gr;
+ for(const n in FP){
+  out.push({p:'Air Goncang',f:n,price:S.p_g,parts:[['Susu pekat',.75],['Ice',.2],['Creamer',.115],['Susu cair',.2],['Packaging',.35],['Flavour',fcost(n,g)]]});
+  out.push({p:'Air Milky Blist',f:n,price:S.p_m,parts:[['Yarra milk',1.1167],['Cup and straw',.28],['Flavour',fcost(n,500/S.mc)]]});
+  out.push({p:'Ais Kepal ('+(S.top==='rice'?'choc rice':'cococrunch')+')',f:n,price:S.p_k,parts:[['Ice',.1833],['Cup',.124],['Topping',S.top==='rice'?.3:.12],['Flavour',fcost(n,S.kg)]]});
+ }
+ out.push({p:'Air Balang',f:'Sparkling lemon',price:S.p_b,parts:[['Sunquick, Fanta and ice',27.625/S.bc],['Cup',.14]]});
+ out.forEach(o=>{o.cost=o.parts.reduce((a,b)=>a+b[1],0);o.profit=o.price-o.cost;o.margin=o.price?o.profit/o.price:0;o.name=o.f==='Sparkling lemon'?o.p:o.p+' - '+o.f});
+ return out.filter(o=>o.f==='Sparkling lemon'||S.fl.has(o.f));
+}
+function render(){
+ const d=build(); if(!d.length)return;
+ $('o_mc').textContent=S.mc+' ('+(500/S.mc).toFixed(0)+'g each)';$('o_bc').textContent=S.bc;$('o_kg').textContent=S.kg+'g';$('o_gg').textContent=S.gg+'g';
+ const bp=[...d].sort((a,b)=>b.profit-a.profit)[0], bm=[...d].sort((a,b)=>b.margin-a.margin)[0], lw=[...d].sort((a,b)=>a.profit-b.profit)[0];
+ $('kpis').innerHTML=`<div class="kpi"><b>${rm(bp.profit)}</b><span>Highest profit: ${bp.name}</span></div><div class="kpi"><b>${pc(bm.margin)}</b><span>Highest margin: ${bm.name}</span></div><div class="kpi"><b>${rm(lw.profit)}</b><span>Lowest profit: ${lw.name}</span></div><div class="kpi"><b>${d.filter(o=>o.profit<0).length}</b><span>Items losing money</span></div>`;
+ const m=S.metric, s=[...d].sort((a,b)=>b[m]-a[m]), mx=Math.max(...s.map(o=>Math.abs(o[m])),.01);
+ $('rank').innerHTML=s.map(o=>`<div class="row"><span>${o.name}</span><div class="bar"><i class="${o[m]<0?'neg':''}" style="width:${Math.max(Math.abs(o[m])/mx*100,1)}%"></i></div><b class="${o[m]<0?'neg':''}">${m==='profit'?rm(o.profit):pc(o.margin)}</b></div>`).join('');
+ const names=d.map(o=>o.name), cur=$('pick').value;
+ $('pick').innerHTML=names.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+ $('pick').value=cur&&+cur<names.length?cur:0;
+ const o=d[+$('pick').value||0];
+ $('stack').innerHTML=o.parts.map((p,i)=>`<div style="width:${p[1]/o.cost*100}%;background:${COL[i%5]}" title="${p[0]} ${rm(p[1])}"></div>`).join('');
+ $('leg').innerHTML=o.parts.map((p,i)=>`<span><i style="background:${COL[i%5]}"></i>${p[0]} ${rm(p[1])} (${(p[1]/o.cost*100).toFixed(0)}%)</span>`).join('')+`<span><b>Total ${rm(o.cost)}</b> | sells ${rm(o.price)}</span>`;
+ $('tb').innerHTML=d.map(o=>`<tr><td>${o.p}</td><td>${o.f}</td><td>${rm(o.cost)}</td><td>${rm(o.price)}</td><td class="${o.profit<0?'neg':''}"><b>${rm(o.profit)}</b></td><td>${pc(o.margin)}</td></tr>`).join('');
+}
+['p_g','p_m','p_b','p_k'].forEach(k=>$(k).addEventListener('input',e=>{S[k]=parseFloat(e.target.value)||0;if(k==='p_k')document.querySelectorAll('#kprice button').forEach(b=>b.classList.toggle('on',+b.dataset.p===S.p_k));render()}));
+['mc','bc','kg','gg'].forEach(k=>$(k).addEventListener('input',e=>{S[k]=+e.target.value;render()}));
+document.querySelectorAll('#kprice button').forEach(b=>b.onclick=()=>{S.p_k=+b.dataset.p;$('p_k').value=S.p_k;document.querySelectorAll('#kprice button').forEach(x=>x.classList.toggle('on',x===b));render()});
+document.querySelectorAll('#top button').forEach(b=>b.onclick=()=>{S.top=b.dataset.t;document.querySelectorAll('#top button').forEach(x=>x.classList.toggle('on',x===b));render()});
+document.querySelectorAll('#metric button').forEach(b=>b.onclick=()=>{S.metric=b.dataset.m;document.querySelectorAll('#metric button').forEach(x=>x.classList.toggle('on',x===b));render()});
+$('fl').innerHTML=Object.keys(FP).map(n=>`<button class="on" data-f="${n}">${n}</button>`).join('');
+document.querySelectorAll('#fl button').forEach(b=>b.onclick=()=>{const n=b.dataset.f;if(S.fl.has(n)){if(S.fl.size>1)S.fl.delete(n)}else S.fl.add(n);b.classList.toggle('on',S.fl.has(n));render()});
+$('pick').onchange=render;
+$('reset').onclick=()=>{Object.assign(S,D);S.fl=new Set(Object.keys(FP));['p_g','p_m','p_b','p_k','mc','bc','kg','gg'].forEach(k=>$(k).value=D[k]);document.querySelectorAll('#fl button').forEach(b=>b.classList.add('on'));document.querySelectorAll('#kprice button').forEach(b=>b.classList.toggle('on',+b.dataset.p===6));document.querySelectorAll('#top button').forEach(b=>b.classList.toggle('on',b.dataset.t==='rice'));render()};
+render();
+</script></body></html>
